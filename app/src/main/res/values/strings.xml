@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">authenticator</string>
+    <string name="title_activity_login">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+
+    <!--Auth0 Credentials-->
+    <string name="com_auth0_client_id">Owu62gnGsRYhk1v9SfB3c6IUbIJcRIze</string>
+    <string name="com_auth0_domain">lbalmaceda.auth0.com</string>
+</resources>
