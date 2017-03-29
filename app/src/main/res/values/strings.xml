@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">authenticator</string>
+    <string name="app_name">Auth0 Authenticator</string>
     <string name="title_activity_login">Sign in</string>
 
     <!-- Strings related to login -->

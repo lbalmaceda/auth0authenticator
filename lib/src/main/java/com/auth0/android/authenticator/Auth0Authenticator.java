@@ -6,7 +6,6 @@ import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
 import android.accounts.NetworkErrorException;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -16,17 +15,18 @@ import com.auth0.android.Auth0Exception;
 import com.auth0.android.authentication.AuthenticationAPIClient;
 import com.auth0.android.result.Credentials;
 
+import static android.accounts.AccountManager.ERROR_CODE_UNSUPPORTED_OPERATION;
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
 import static android.accounts.AccountManager.KEY_ERROR_MESSAGE;
 
-public class Auth0Authenticator extends AbstractAccountAuthenticator {
+class Auth0Authenticator extends AbstractAccountAuthenticator {
 
     private String TAG = Auth0Authenticator.class.getSimpleName();
 
     private final AuthenticationAPIClient apiClient;
     private final Context context;
 
-    public Auth0Authenticator(Context context) {
+    Auth0Authenticator(Context context) {
         super(context);
         this.context = context;
         Auth0 account = new Auth0(context);
@@ -37,17 +37,11 @@ public class Auth0Authenticator extends AbstractAccountAuthenticator {
 
     @Override
     public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options) throws NetworkErrorException {
-        Log.d(TAG, "addAccount");
-
-        final Intent intent = new Intent(context, AuthenticatorActivity.class);
-        intent.putExtra(AuthenticatorActivity.KEY_ACCOUNT_TYPE, accountType);
-        intent.putExtra(AuthenticatorActivity.KEY_IS_ADDING_NEW_ACCOUNT, true);
-        intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
-
-        final Bundle bundle = new Bundle();
-        bundle.putParcelable(AccountManager.KEY_INTENT, intent);
-        return bundle;
+        Log.d(TAG, "addAccount (settings screen)");
+        response.onError(ERROR_CODE_UNSUPPORTED_OPERATION, "Manual account creation is disabled.");
+        return null;
     }
+
 
     @Override
     public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options) throws NetworkErrorException {
@@ -59,6 +53,7 @@ public class Auth0Authenticator extends AbstractAccountAuthenticator {
 
         String authToken = am.peekAuthToken(account, authTokenType);
         if (!Authenticator.isTokenExpired(am, account, authToken)) {
+            Log.d(TAG, "token from cache");
             return createAuthBundle(account, authToken);
         }
 
@@ -67,7 +62,7 @@ public class Auth0Authenticator extends AbstractAccountAuthenticator {
         Log.d(TAG, "getPassword returned - " + refreshToken);
         if (!TextUtils.isEmpty(refreshToken)) {
             try {
-                Log.d(TAG, "re-authenticating with the existing refresh token");
+                Log.d(TAG, "refreshed token");
                 final Credentials credentials = apiClient.renewAuth(refreshToken).execute();
                 am.setAuthToken(account, authTokenType, credentials.getAccessToken());
                 return createAuthBundle(account, credentials.getAccessToken());
@@ -78,7 +73,7 @@ public class Auth0Authenticator extends AbstractAccountAuthenticator {
 
         // No valid tokens found. Launch AuthenticatorActivity.
         Bundle missingTokenBundle = new Bundle();
-        missingTokenBundle.putString(KEY_ERROR_MESSAGE, "No token found. Invalidate and restart.");
+        missingTokenBundle.putString(KEY_ERROR_MESSAGE, "No tokens found. You should call setToken first.");
         return missingTokenBundle;
     }
 
@@ -92,7 +87,7 @@ public class Auth0Authenticator extends AbstractAccountAuthenticator {
 
     @Override
     public String getAuthTokenLabel(String authTokenType) {
-        return "Auth0 Access Token";
+        return null;
     }
 
     @Override
