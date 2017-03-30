@@ -74,11 +74,6 @@ public class DemoActivity extends Activity {
                     public void onError(Exception error) {
                         showToast("Failed to remove account: " + error.getMessage());
                     }
-
-                    @Override
-                    public void onCanceled() {
-                        showToast("Remove account canceled!");
-                    }
                 });
             }
         });
@@ -96,11 +91,6 @@ public class DemoActivity extends Activity {
             @Override
             public void onError(Exception error) {
                 showToast("Error getting token: " + error.getMessage());
-            }
-
-            @Override
-            public void onCanceled() {
-                showToast("Get token canceled!");
             }
         });
     }
@@ -125,11 +115,6 @@ public class DemoActivity extends Activity {
                                     @Override
                                     public void onError(Exception error) {
                                         showToast("Failed to set token: " + error.getMessage());
-                                    }
-
-                                    @Override
-                                    public void onCanceled() {
-                                        showToast("Canceled");
                                     }
                                 });
                     }

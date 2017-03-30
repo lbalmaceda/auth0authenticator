@@ -43,6 +43,7 @@ class Auth0Authenticator extends AbstractAccountAuthenticator {
     }
 
 
+    @SuppressWarnings("MissingPermission")
     @Override
     public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options) throws NetworkErrorException {
         Log.d(TAG, "getAuthToken");

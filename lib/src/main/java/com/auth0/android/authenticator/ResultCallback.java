@@ -19,9 +19,4 @@ public interface ResultCallback<T> {
      * @param error the exception.
      */
     void onError(Exception error);
-
-    /**
-     * Called when the result gets canceled.
-     */
-    void onCanceled();
 }

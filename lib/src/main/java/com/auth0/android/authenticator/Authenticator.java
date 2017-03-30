@@ -48,6 +48,7 @@ public class Authenticator {
      *
      * @param callback the callback that will get this call result.
      */
+    @SuppressWarnings("MissingPermission")
     public void getToken(final ResultCallback<String> callback) {
         pickAccount(am, new ResultCallback<Account>() {
 
@@ -78,7 +79,6 @@ public class Authenticator {
                             final String accessToken = result.getString(AccountManager.KEY_AUTHTOKEN);
                             callback.onResult(accessToken);
                         } catch (Exception e) {
-                            e.printStackTrace();
                             callback.onError(e);
                         }
                     }
@@ -87,12 +87,7 @@ public class Authenticator {
 
             @Override
             public void onError(Exception error) {
-
-            }
-
-            @Override
-            public void onCanceled() {
-                callback.onCanceled();
+                callback.onError(error);
             }
         });
     }
@@ -105,6 +100,7 @@ public class Authenticator {
      * @param expiresIn    the time at which the given access token will expire.
      * @param setCallback  the callback that will get this call result.
      */
+    @SuppressWarnings("MissingPermission")
     public void setTokens(final String accessToken, final String refreshToken, final long expiresIn, final ResultCallback<Boolean> setCallback) {
         pickAccount(am, new ResultCallback<Account>() {
             @Override
@@ -126,11 +122,6 @@ public class Authenticator {
             public void onError(Exception error) {
                 setCallback.onError(error);
             }
-
-            @Override
-            public void onCanceled() {
-                setCallback.onCanceled();
-            }
         });
     }
 
@@ -139,19 +130,19 @@ public class Authenticator {
      *
      * @param removeCallback the callback that will get this call result.
      */
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({"MissingPermission", "deprecation"})
     public void removeAccount(final ResultCallback<Boolean> removeCallback) {
         pickAccount(am, new ResultCallback<Account>() {
             @Override
             public void onResult(Account account) {
                 if (account != null) {
                     am.removeAccount(account, new AccountManagerCallback<Boolean>() {
+                        @SuppressWarnings("MissingPermission")
                         @Override
                         public void run(AccountManagerFuture<Boolean> future) {
                             try {
                                 removeCallback.onResult(future.getResult());
                             } catch (Exception e) {
-                                e.printStackTrace();
                                 removeCallback.onError(e);
                             }
                         }
@@ -163,11 +154,6 @@ public class Authenticator {
             public void onError(Exception error) {
                 removeCallback.onError(error);
             }
-
-            @Override
-            public void onCanceled() {
-                removeCallback.onCanceled();
-            }
         });
     }
 
@@ -177,6 +163,7 @@ public class Authenticator {
      *
      */
 
+    @SuppressWarnings("MissingPermission")
     private void createAccount(final AccountManager accountManager, final String accessToken, final String refreshToken, final long expirationTime, final ResultCallback<Boolean> setCallback) {
         Auth0 auth0 = new Auth0(activity);
         auth0.setLoggingEnabled(true);
@@ -197,17 +184,18 @@ public class Authenticator {
 
             @Override
             public void onFailure(AuthenticationException error) {
-                error.printStackTrace();
                 setCallback.onError(error);
             }
         });
     }
 
+    @SuppressWarnings("MissingPermission")
     static boolean isTokenExpired(AccountManager accountManager, Account account, String authToken) {
         final String expirationTime = accountManager.getUserData(account, KEY_EXPIRATION_TIME);
         return TextUtils.isEmpty(authToken) || TextUtils.isEmpty(expirationTime) || System.currentTimeMillis() > Long.parseLong(expirationTime);
     }
 
+    @SuppressWarnings("MissingPermission")
     private void pickAccount(final AccountManager accountManager, ResultCallback<Account> callback) {
         final Account[] accounts = accountManager.getAccountsByType(accountType);
         if (accounts.length == 0) {
